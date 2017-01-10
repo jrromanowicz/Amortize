@@ -5,11 +5,6 @@
 
 extern string ftoa(double) ;
 extern string itoa(int) ;
-// GEEK!
-//AmortizeTable::AmortizeTable(int x, int y, int w, int h):
-//		Fl_Table(x,y,w,h,"") {
-//	init() ; // do common things
-//} // ctor without label
 
 AmortizeTable::AmortizeTable(int x, int y, int w, int h, const char *label) :
 		Fl_Table(x,y,w,h,label) {

@@ -2,109 +2,72 @@
 #include <sstream>
 #include <cmath>
 #include <string.h>
+#include <cstdio>
+#include <FL/fl_ask.h>
 
-string ftoa(double _value) {
-	ostringstream buf ;
-	buf.setf(ios::fixed) ;
-	buf.precision(2) ;
-	buf << _value ;
-	return buf.str() ;
+string ftoa(double value) {
+  ostringstream buf ;
+  buf.setf(ios::fixed) ;
+  buf.precision(2) ;
+  buf << value ;
+  return buf.str() ;
 }
 
-string itoa(int _value) {
-	ostringstream buf ;
-	buf << _value ;
-	return buf.str() ;
+string itoa(int value) {
+  ostringstream buf ;
+  buf << value ;
+  return buf.str() ;
 }
 
-void Amortize::principalAmount(float _value) throw (out_of_range) {
-	if (_value > 0) {
-		principalAmt = _value ;
-	}
-	else {
-		principalAmt = 0. ;
-		throw out_of_range(string("Principal must be positive, not ") + ftoa(_value)) ;
-	}
-} // principal()
+Amortize::Amortize(LoanData& loan_) : loan(loan_)
+{
+  switch (loan.paymentPeriod()) {
+    case LoanData::BiWeeklyPeriod: pmtsPerYear = 26 ; break ;
+    case LoanData::SemiMonthlyPeriod: pmtsPerYear = 24 ; break ;
+    case LoanData::MonthlyPeriod: pmtsPerYear = 12 ; break ;
+    case LoanData::QuarterlyPeriod: pmtsPerYear = 4 ; break ;
+    case LoanData::SemiAnnualPeriod: pmtsPerYear = 2 ; break ;
+    case LoanData::AnnualPeriod: pmtsPerYear = 1 ; break ;
+    default: throw domain_error("Invalid payment period") ;
+  } // switch on payment period
+  loan.checkAllParameters(); // will throw exception if any parameter is invalid
 
-void Amortize::interestRate(float _value) throw (out_of_range) {
-	if (_value > 0) {
-		intRate = _value ;
-	}
-	else {
-		intRate = 0. ;
-		throw out_of_range(string("Interest rate must be positive, not ") + ftoa(_value)) ;
-	}
-} // interestRate()
+  // got good parameters, create the amortization data
+  vector<PaymentData> * payData = new vector<PaymentData>;
+  const char * loanType;
+  switch (loan.loanType()) {
+    case LoanData::InstallmentLoan:
+      amortizeInstallmentLoan(*payData) ;
+      loanType = "Installment loan";
+      break ;
+    case LoanData::FixedPaymentLoan:
+      amortizeFixedPayment(*payData) ;
+      loanType = "Revolving charge";
+      break ;
+    case LoanData::PercentPaymentLoan:
+      amortizePercentPayment(*payData) ;
+      loanType = "Revolving charge";
+      break ;
+    default:
+      throw domain_error("Unknown loan type") ;
+      break ;
+  } // switch on loan type
+  // display the table
+  sprintf(title, "%s of %.2f at %.3f%%", loanType, loan.principalAmount(),
+      loan.interestRate());
+  myUI = new PaymentTableUI(loan, title, *payData);
+} // ctor
 
-void Amortize::numPayments(int _value) throw (out_of_range) {
-	if (_value > 0) {
-		payments = _value ;
-	}
-	else {
-		payments = 0 ;
-		throw out_of_range(string("Payments must be positive, not ") + itoa(_value)) ;
-	}
-} // numPayments()
-
-void Amortize::fixedPayment(float _value) throw (out_of_range) {
-	if (_value > 0) {
-		fixedPmt = _value ;
-	}
-	else {
-		fixedPmt = 0. ;
-		throw out_of_range(string("Fixed payment must be positive, not ") + ftoa(_value)) ;
-	}
-} // fixedPayment()
-
-void Amortize::paymentPercent(float _value) throw (out_of_range) {
-	if (_value > 0 && _value < 100) {
-		paymentPct = _value ;
-	}
-	else {
-		paymentPct = 0. ;
-		throw out_of_range(string("Payment percent must be positive and less than 100, not ")
-		                  + ftoa(_value)) ;
-	}
-} // paymentPercent()
-
-void Amortize::minimumPayment(float _value) throw (out_of_range) {
-	if (_value > 0) {
-		minPayment = _value ;
-	}
-	else {
-		minPayment = 0. ;
-		throw out_of_range(string("Minimum payment must be positive, not ") + ftoa(_value)) ;
-	}
-} // minimumPayment()
-
-void Amortize::paymentsPerYear(int _value) throw (out_of_range) {
-	if (_value > 0 ) {
-		pmtsPerYear = _value ;
-	}
-	else {
-		pmtsPerYear = 0 ;
-		throw out_of_range(string("Payments per year must be positive, not ") + itoa(_value)) ;
-	}
-} // paymentsPerYear()
-
-void Amortize::firstPaymentDate(struct tm * _value = 0) {
-	if (_value ) {
-		memcpy(&firstPayDate, _value, sizeof(firstPayDate)) ;
-	}
-	else {
-		time_t now = time(NULL) ;
-		memcpy(&firstPayDate, localtime(&now), sizeof(firstPayDate)) ;
-	}
-} // firstPaymentDate()
-
-PaymentData * Amortize::makePayment(double balance, double intRate, double payment,
-                             int pymtNum) throw (out_of_range) {
+#include <cmath>
+PaymentData * Amortize::makePayment(double balance, double intRate,
+    double payment, int pymtNum) {
 	double interest = balance * intRate ; // interest paid
+	interest = round(interest * 100) / 100; // round to nearest penny
 	double principal = payment - interest ; // principal paid
 	if (principal <= 0) {
-	  throw out_of_range(string("The payment amount (" + ftoa(payment) + ") "
-	      "must be greater than the first period interest (" + ftoa(interest) + ")"));
+	  fl_alert("The payment amount (%.2f) must be greater\nthan the first "
+	      "period interest (%.2f)", payment, interest);
+	  throw logic_error("Fixed payment is too small");
 	} // if principal paid is not positive (TRUE branch)
 	if (principal > balance) { // recalc if payment's bigger than what's owed
 		payment = balance + interest ;
@@ -112,40 +75,50 @@ PaymentData * Amortize::makePayment(double balance, double intRate, double payme
 		balance = 0 ;
 	} // if overpaid (TRUE branch)
 	else balance -= principal ;
-	if (balance < .01) balance = 0 ;  // avoid an extra payment
+	if (balance < 1.00) {   // avoid an extra payment for small amt
+	  payment += balance;
+	  principal += balance;
+    balance = 0 ;
+	}
+
 	return new PaymentData(principal, interest, balance, pymtNum, NULL) ;
 } // makePayment()
 
 void Amortize::amortizeFixedPayment(vector<PaymentData> & data) {
-	double bal = principalAmt ;
-	double rate = (intRate / pmtsPerYear) / 100 ;
-	int pymtNum = 0 ;
+  if (interestRate() && pmtsPerYear && principalAmount() && fixedPayment()) {
+    double bal = principalAmount() ;
+    double rate = (interestRate() / pmtsPerYear) / 100 ;
+    int pymtNum = 0 ;
 
-	while (bal > 0) {
-		PaymentData * pd = makePayment( bal, rate, fixedPayment(), ++pymtNum ) ;
-		data.push_back( *pd ) ;
-		bal = pd->balance() ;
-	}  // while there's a balance left
+    while (bal > 0) {
+      PaymentData * pd = makePayment( bal, rate, fixedPayment(), ++pymtNum ) ;
+      data.push_back( *pd ) ;
+      bal = pd->balance() ;
+    }  // while there's a balance left
+  } // if all needed values are set (TRUE branch)
 } // amortizeFixedPayment()
 
 void Amortize::amortizePercentPayment(vector<PaymentData> & data) {
-	double bal = principalAmt ;
-	double rate = (intRate / pmtsPerYear) / 100 ;
-	int pymtNum = 0 ;
+  if (interestRate() && pmtsPerYear && principalAmount() && paymentPercent() && minimumPayment()) {
+    double bal = principalAmount() ;
+    double rate = (interestRate() / pmtsPerYear) / 100 ;
+    int pymtNum = 0 ;
 
-	while (bal > 0 ) {
-		double payment = max(bal * paymentPct / 100, minPayment) ;
-		PaymentData * pd = makePayment( bal, rate, payment, ++pymtNum ) ;
-		data.push_back( *pd ) ;
-		bal = pd->balance() ;
+    while (bal > 0 ) {
+      double payment = max(bal * paymentPercent() / 100, minimumPayment()) ;
+      payment = round(payment * 100) / 100; // round to nearest penny
+      PaymentData * pd = makePayment( bal, rate, payment, ++pymtNum ) ;
+      data.push_back( *pd ) ;
+      bal = pd->balance() ;
 	  }  // while there's a balance left
+  } // if all needed values are set (TRUE branch)
 } // amortizePercentPayment()
 
 void Amortize::amortizeInstallmentLoan(vector<PaymentData> & data) {
-	if (intRate && pmtsPerYear && principalAmt && payments) {
-		double payment = calcInstallmentPayment() ;
-		double bal = principalAmt ;
-		double rate = (intRate / pmtsPerYear) / 100 ;
+	if (interestRate() && pmtsPerYear && principalAmount() && numberOfPayments()) {
+		double payment = round(calcInstallmentPayment() * 100) / 100 ; // round to nearest penny
+	  double bal = principalAmount() ;
+	  double rate = (interestRate() / pmtsPerYear) / 100 ;
 		int pymtNum = 0 ;
 
 		while (bal > 0 ) {
@@ -157,9 +130,9 @@ void Amortize::amortizeInstallmentLoan(vector<PaymentData> & data) {
 } // amortizeInstallmentLoan()
 
 double Amortize::calcInstallmentPayment() {
-	if (intRate && pmtsPerYear && principalAmt && payments) {
-		double rate = (intRate / pmtsPerYear) / 100 ;
-		return principalAmt * (rate / (1 - pow(1. + rate, - payments))) ;
+  if (interestRate() && pmtsPerYear && principalAmount() && numberOfPayments()) {
+		double rate = (interestRate() / pmtsPerYear) / 100 ;
+		return principalAmount() * (rate / (1 - pow(1. + rate, - numberOfPayments()))) ;
 	}  // if all the needed values are defined (TRUE branch)
 	else return 0 ; // not ready to rumble
 } // calcInstallmentPayment()

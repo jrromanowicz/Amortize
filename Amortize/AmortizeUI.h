@@ -6,7 +6,7 @@
 #include <FL/Fl_Text_Display.H>
 #include <string>
 #include <Fl/Fl_Window.H>
-#include "AmortizeTable.h"
+#include "Amortize.h"
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Float_Input.H>
 #include <FL/Fl_Int_Input.H>
@@ -16,20 +16,35 @@
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/fl_show_colormap.H>
+#include "LoanData.h"
+#include <vector>
 
 class AmortizeUI : Fl_Window {
 public:
-  enum PaymentPeriod {InvalidPeriod = 0, BiWeeklyPeriod, SemiMonthlyPeriod,
-    MonthlyPeriod, QuarterlyPeriod, SemiAnnualPeriod, AnnualPeriod} ;
-  enum LoanType {InvalidLoan = 0, InstallmentLoan, RevolvingChargeLoan,
-    FixedPaymentLoan, PercentPaymentLoan } ;
-  AmortizeUI(void (*doAmortize)(AmortizeUI *), void(*saveFunc)(AmortizeUI *),
-      const char * title);
+  AmortizeUI(const char * title);
+  virtual ~AmortizeUI() {}
 
+  double getPrincipalAmount(void);
+  double getInterestRate(void);
+  LoanData::PaymentPeriod getPaymentPeriod(void);
+  LoanData::LoanType getLoanType(void);
+  int getNumPayments(void);
+  double getFixedPayment(void);
+  double getPercentPayment(void);
+  double getMinimumPayment(void);
+  void setText(std::string text);
+  void addText(std::string text);
+  char * getText(void);
+  void hideSaveButton();
+  void showSaveButton();
+  void show(int argc, char ** argv) {Fl_Window::show(argc, argv);}
+  Fl_Text_Buffer resultText ;
 private:
   int handle(int event);
   Fl_Text_Display *results;
-  AmortizeTable *amortizeTable;
+  LoanData *loan;
+  void doAmortization(void);
+  static void cb_Amortize(Fl_Button*, void*);
   void cb_Principal_i(Fl_Float_Input*, void*);
   static void cb_Principal(Fl_Float_Input*, void*);
   void cb_Interest_i(Fl_Float_Input*, void*);
@@ -59,55 +74,14 @@ private:
   Fl_Float_Input *minPayment;
   void cb_minPayment_i(Fl_Float_Input*, void*);
   static void cb_minPayment(Fl_Float_Input*, void*);
-  void cb_Amortize_i(Fl_Button*, void*);
-  static void cb_Amortize(Fl_Button*, void*);
-public:
-  Fl_Button *saveButton;
-private:
-  void cb_saveButton_i(Fl_Button*, void*);
-  static void cb_saveButton(Fl_Button*, void*);
-public:
-  Fl_Group *colorButtons;
-private:
-  Fl_Button *Col1Color;
-  void cb_Col1Color_i(Fl_Button*, void*);
-  static void cb_Col1Color(Fl_Button*, void*);
-  Fl_Button *Col2Color;
-  void cb_Col2Color_i(Fl_Button*, void*);
-  static void cb_Col2Color(Fl_Button*, void*);
-  Fl_Button *Col3Color;
-  void cb_Col3Color_i(Fl_Button*, void*);
-  static void cb_Col3Color(Fl_Button*, void*);
-  Fl_Button *Col4Color;
-  void cb_Col4Color_i(Fl_Button*, void*);
-  static void cb_Col4Color(Fl_Button*, void*);
-public:
-  double getPrincipalAmount(void);
-  double getInterestRate(void);
-  AmortizeUI::PaymentPeriod getPaymentPeriod(void);
-  AmortizeUI::LoanType getLoanType(void);
-  int getNumPayments(void);
-  double getFixedPayment(void);
-  double getPercentPayment(void);
-  double getMinimumPayment(void);
-  void setText(std::string text);
-  void addText(std::string text);
-  char * getText(void);
-  AmortizeTable * getPaymentTable(void);
-  void hideSaveButton();
-  void showSaveButton();
-  void show(int argc, char ** argv) {Fl_Window::show(argc, argv);}
-  Fl_Text_Buffer resultText ;
-private:
+
   double principalAmount;
   double interestRate;
-  PaymentPeriod paymentPeriod;
-  LoanType loanType;
+  LoanData::PaymentPeriod paymentPeriod;
+  LoanData::LoanType loanType;
   double fixedPayment;
   double percentPayment;
   double minimumPayment;
   int numPayments;
-  void (*doAmortization)(AmortizeUI *) ;
-  void (*doSave)(AmortizeUI *);
 };
 #endif

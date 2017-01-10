@@ -14,7 +14,6 @@ class AmortizeTable : public Fl_Table {
 public :
 
 	AmortizeTable(int x, int y, int w, int h, const char * label = 0) ;
-//	AmortizeTable(int x, int y, int w, int h) ; // GEEK!
 	virtual ~AmortizeTable() { }
 
 	void addRow(string & val) ; // append a row to the table
