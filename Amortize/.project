@@ -3,12 +3,10 @@
 	<name>Amortize</name>
 	<comment></comment>
 	<projects>
-		<project>libfltk</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
-			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>?name?</key>

@@ -21,7 +21,7 @@
 #include <FL/fl_show_colormap.H>
 #include <FL/Fl_Multiline_Output.h>
 
-class PaymentTableUI: public Fl_Window {
+class PaymentTableUI {
 public:
   PaymentTableUI(const LoanData& loan, const char * title,
       vector<PaymentData>& payData);
@@ -29,6 +29,7 @@ public:
   Fl_Group *colorButtons;
 
 private:
+  Fl_Window * window;
   double interestTotal;
   double paymentsTotal;
   AmortizeTable *amortizeTable;

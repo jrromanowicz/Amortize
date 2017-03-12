@@ -16,8 +16,8 @@
 extern string ftoa(double);
 
 PaymentTableUI::PaymentTableUI(const LoanData& loan_, const char * title,
-    vector<PaymentData> & payData) :
-    Fl_Window(425, 606, title), loan(loan_), payData(payData) {
+    vector<PaymentData> & payData) : loan(loan_), payData(payData) {
+  window = new Fl_Window(425, 606, title);
   { totals = new Fl_Multiline_Output(2, 2, 429, 54);
     totals->box(FL_NO_BOX);
   } // Fl_Multiline_output * totals
@@ -60,7 +60,7 @@ PaymentTableUI::PaymentTableUI(const LoanData& loan_, const char * title,
     saveButton->callback((Fl_Callback*)cb_saveButton, (void*)(this));
   } // Fl_Button* saveButton
 
-  end();
+  window->end();
 
   interestTotal = 0. ;
   for (unsigned int i = 0 ; i < payData.size() ; i++ ) {
@@ -71,7 +71,7 @@ PaymentTableUI::PaymentTableUI(const LoanData& loan_, const char * title,
   sprintf(total, "There are %d payments\nTotal Interest: %.2f\nTotal Payments: %.2f",
       payData.size(), interestTotal, paymentsTotal);
   totals->value(total);
-  show();
+  window->show();
 } // PaymentTableUI ctor
 
 PaymentTableUI::~PaymentTableUI() {

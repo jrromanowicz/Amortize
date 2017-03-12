@@ -25,12 +25,13 @@
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level.1258567001" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level.384851764" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.781274094" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;C:\Users\Jack\My Programming\C and C++ Projects\fltk_source\fltk-1.3.4-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}\fltk-1.3.4-1&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.793091831" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="WIN32"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.1413332770" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mwindows" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.946250987" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1823639704" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.320054674" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug">
@@ -50,12 +51,11 @@
 									<listOptionValue builtIn="false" value="uuid"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1868121553" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;C:\Users\Jack\My Programming\C and C++ Projects\fltk_source\fltk-1.3.4-1\lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\MinGW\lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}\fltk-1.3.4-1\lib&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.userobjs.1207026249" name="Other objects" superClass="gnu.cpp.link.option.userobjs" useByScannerDiscovery="false"/>
 								<option id="gnu.cpp.link.option.nostart.380070326" name="Do not use standard start files (-nostartfiles)" superClass="gnu.cpp.link.option.nostart" useByScannerDiscovery="false" value="false" valueType="boolean"/>
-								<option id="gnu.cpp.link.option.flags.650266183" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-mwindows" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.650266183" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-static -mwindows" valueType="string"/>
 								<option id="gnu.cpp.link.option.other.1056149828" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.354735238" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -95,7 +95,7 @@
 								<option id="gnu.cpp.compiler.mingw.exe.release.option.debugging.level.1651176178" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.380379022" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1148470408" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}\fltk-1.3.4-1&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.1691496759" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mwindows -DWIN32" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.other.verbose.2011634889" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose" useByScannerDiscovery="false" value="false" valueType="boolean"/>
@@ -122,14 +122,12 @@
 									<listOptionValue builtIn="false" value="uuid"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.671117839" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;C:\MinGW\lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Users\Jack\My Programming\C and C++ Projects\fltk_source\fltk-1.1.9\lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Users\Jack\My Programming\C and C++ Projects\fltk_source\Fl_Table-3.13&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}\fltk-1.3.4-1\lib&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.strip.1301457509" name="Omit all symbol information (-s)" superClass="gnu.cpp.link.option.strip" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.other.1693796964" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false"/>
 								<option id="gnu.cpp.link.option.userobjs.751512064" name="Other objects" superClass="gnu.cpp.link.option.userobjs" useByScannerDiscovery="false"/>
-								<option id="gnu.cpp.link.option.flags.777628391" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-mwindows -static-libgcc -static-libstdc++" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.777628391" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-mwindows -static" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1143472873" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
