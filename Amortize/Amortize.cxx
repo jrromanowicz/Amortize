@@ -33,29 +33,20 @@ Amortize::Amortize(LoanData& loan_) : loan(loan_)
   loan.checkAllParameters(); // will throw exception if any parameter is invalid
 
   // got good parameters, create the amortization data
-  vector<PaymentData> * payData = new vector<PaymentData>;
-  const char * loanType;
   switch (loan.loanType()) {
     case LoanData::InstallmentLoan:
-      amortizeInstallmentLoan(*payData) ;
-      loanType = "Installment loan";
+      amortizeInstallmentLoan() ;
       break ;
     case LoanData::FixedPaymentLoan:
-      amortizeFixedPayment(*payData) ;
-      loanType = "Revolving charge";
+      amortizeFixedPayment() ;
       break ;
     case LoanData::PercentPaymentLoan:
-      amortizePercentPayment(*payData) ;
-      loanType = "Revolving charge";
+      amortizePercentPayment() ;
       break ;
     default:
       throw domain_error("Unknown loan type") ;
       break ;
   } // switch on loan type
-  // display the table
-  sprintf(title, "%s of %.2f at %.3f%%", loanType, loan.principalAmount(),
-      loan.interestRate());
-  myUI = new PaymentTableUI(loan, title, *payData);
 } // ctor
 
 #include <cmath>
@@ -84,7 +75,7 @@ PaymentData * Amortize::makePayment(double balance, double intRate,
 	return new PaymentData(principal, interest, balance, pymtNum, NULL) ;
 } // makePayment()
 
-void Amortize::amortizeFixedPayment(vector<PaymentData> & data) {
+void Amortize::amortizeFixedPayment() {
   if (interestRate() && pmtsPerYear && principalAmount() && fixedPayment()) {
     double bal = principalAmount() ;
     double rate = (interestRate() / pmtsPerYear) / 100 ;
@@ -92,13 +83,13 @@ void Amortize::amortizeFixedPayment(vector<PaymentData> & data) {
 
     while (bal > 0) {
       PaymentData * pd = makePayment( bal, rate, fixedPayment(), ++pymtNum ) ;
-      data.push_back( *pd ) ;
+      payData.push_back( *pd ) ;
       bal = pd->balance() ;
     }  // while there's a balance left
   } // if all needed values are set (TRUE branch)
 } // amortizeFixedPayment()
 
-void Amortize::amortizePercentPayment(vector<PaymentData> & data) {
+void Amortize::amortizePercentPayment() {
   if (interestRate() && pmtsPerYear && principalAmount() && paymentPercent() && minimumPayment()) {
     double bal = principalAmount() ;
     double rate = (interestRate() / pmtsPerYear) / 100 ;
@@ -108,13 +99,13 @@ void Amortize::amortizePercentPayment(vector<PaymentData> & data) {
       double payment = max(bal * paymentPercent() / 100, minimumPayment()) ;
       payment = round(payment * 100) / 100; // round to nearest penny
       PaymentData * pd = makePayment( bal, rate, payment, ++pymtNum ) ;
-      data.push_back( *pd ) ;
+      payData.push_back( *pd ) ;
       bal = pd->balance() ;
 	  }  // while there's a balance left
   } // if all needed values are set (TRUE branch)
 } // amortizePercentPayment()
 
-void Amortize::amortizeInstallmentLoan(vector<PaymentData> & data) {
+void Amortize::amortizeInstallmentLoan() {
 	if (interestRate() && pmtsPerYear && principalAmount() && numberOfPayments()) {
 		double payment = round(calcInstallmentPayment() * 100) / 100 ; // round to nearest penny
 	  double bal = principalAmount() ;
@@ -123,7 +114,7 @@ void Amortize::amortizeInstallmentLoan(vector<PaymentData> & data) {
 
 		while (bal > 0 ) {
 			PaymentData * pd = makePayment( bal, rate, payment, ++pymtNum ) ;
-			data.push_back( *pd ) ;
+			payData.push_back( *pd ) ;
 			bal = pd->balance() ;
 	  	} // while there's a balance left
 	} // if all fields have values (TRUE branch)

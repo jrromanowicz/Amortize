@@ -3,7 +3,6 @@
 
 #include "PaymentData.h"
 #include "LoanData.h"
-#include "PaymentTableUI.h"
 #include <string>
 #include <stdexcept>
 #include <vector>
@@ -21,28 +20,27 @@ public:
 Amortize(LoanData& loan);
 virtual ~Amortize() { }
 
-double interestRate(void) {return loan.interestRate() ; }
-double principalAmount(void) {return loan.principalAmount() ; }
-int    numberOfPayments(void) {return loan.numberOfPayments() ; }
-double fixedPayment(void) {return loan.fixedPayment() ; }
-double paymentPercent(void) {return loan.paymentPercent() ; }
-double minimumPayment(void) {return loan.minimumPayment() ; }
-int    paymentsPerYear(void) {return pmtsPerYear ; }
-time_t firstPaymentDate(void) {return loan.firstPayDate() ; }
-Fl_Window* paymentUI(void) {return (Fl_Window *)myUI;}
+double interestRate(void) const {return loan.interestRate() ; }
+double principalAmount(void) const {return loan.principalAmount() ; }
+int    numberOfPayments(void) const {return loan.numberOfPayments() ; }
+double fixedPayment(void) const {return loan.fixedPayment() ; }
+double paymentPercent(void) const {return loan.paymentPercent() ; }
+double minimumPayment(void) const {return loan.minimumPayment() ; }
+int    paymentsPerYear(void) const {return pmtsPerYear ; }
+time_t firstPaymentDate(void) const {return loan.firstPayDate() ; }
+vector<PaymentData> &paymentData() {return payData;}
 
 private:
 
 LoanData& loan;
 int pmtsPerYear;
-PaymentTableUI * myUI;
-char title[100];
+vector<PaymentData> payData;
 
 PaymentData* makePayment(double bal, double intRate, double payment, int pymtNum);
 double calcInstallmentPayment(void) ;
-void amortizeFixedPayment(vector<PaymentData> &payments) ;
-void amortizePercentPayment(vector<PaymentData> &payments) ;
-void amortizeInstallmentLoan(vector<PaymentData> &payments) ;
+void amortizeFixedPayment() ;
+void amortizePercentPayment() ;
+void amortizeInstallmentLoan() ;
 
 
 } ; // class Amortize

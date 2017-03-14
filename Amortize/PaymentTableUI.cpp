@@ -18,6 +18,7 @@ extern string ftoa(double);
 PaymentTableUI::PaymentTableUI(const LoanData& loan_, const char * title,
     vector<PaymentData> & payData) : loan(loan_), payData(payData) {
   window = new Fl_Window(425, 606, title);
+  window->user_data((void*)(this));
   { totals = new Fl_Multiline_Output(2, 2, 429, 54);
     totals->box(FL_NO_BOX);
   } // Fl_Multiline_output * totals

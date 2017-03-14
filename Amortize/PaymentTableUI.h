@@ -27,6 +27,7 @@ public:
       vector<PaymentData>& payData);
   virtual ~PaymentTableUI();
   Fl_Group *colorButtons;
+  void hide() { window->hide(); }
 
 private:
   Fl_Window * window;

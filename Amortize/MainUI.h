@@ -17,12 +17,13 @@
 #include <FL/Fl_Button.H>
 #include <FL/fl_show_colormap.H>
 #include "LoanData.h"
+#include "PaymentTableUI.h"
 #include <vector>
 
-class AmortizeUI : Fl_Window {
+class MainUI : Fl_Window {
 public:
-  AmortizeUI(const char * title);
-  virtual ~AmortizeUI() {}
+  MainUI(const char * title);
+  virtual ~MainUI() {}
 
   double getPrincipalAmount(void);
   double getInterestRate(void);
@@ -43,7 +44,9 @@ private:
   int handle(int event);
   Fl_Text_Display *results;
   LoanData *loan;
+  vector<PaymentTableUI *> loanWindows;
   void doAmortization(void);
+  static void cb_Close(Fl_Widget *, void *);
   static void cb_Amortize(Fl_Button*, void*);
   void cb_Principal_i(Fl_Float_Input*, void*);
   static void cb_Principal(Fl_Float_Input*, void*);
