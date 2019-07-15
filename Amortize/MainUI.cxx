@@ -254,13 +254,13 @@ void MainUI::doAmortization(void) {
     string type;
     switch (loanType) {
       case LoanData::InstallmentLoan:
-        type = "InstallmentLoan";
+        type = "Installment Loan";
         break ;
       case LoanData::FixedPaymentLoan:
-        type = "FixedPayment";
+        type = "Fixed Payment Loan";
         break ;
       case LoanData::PercentPaymentLoan:
-        type = "PercentPayment";
+        type = "Percent Payment Loan";
         break ;
       default:
         throw domain_error("Unknown loan type") ;

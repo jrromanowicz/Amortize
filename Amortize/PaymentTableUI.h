@@ -26,7 +26,6 @@ public:
   PaymentTableUI(const LoanData& loan, const char * title,
       vector<PaymentData>& payData);
   virtual ~PaymentTableUI();
-  Fl_Group *colorButtons;
   void hide() { window->hide(); }
 
 private:
@@ -37,22 +36,9 @@ private:
   const LoanData& loan;
   vector<PaymentData> payData ;
   Fl_Button *saveButton;
-  Fl_Multiline_Output *totals;
   void doSave(void);
   void cb_saveButton_i(Fl_Button*, void*);
   static void cb_saveButton(Fl_Button*, void*);
-  Fl_Button *Col1Color;
-  void cb_Col1Color_i(Fl_Button*, void*);
-  static void cb_Col1Color(Fl_Button*, void*);
-  Fl_Button *Col2Color;
-  void cb_Col2Color_i(Fl_Button*, void*);
-  static void cb_Col2Color(Fl_Button*, void*);
-  Fl_Button *Col3Color;
-  void cb_Col3Color_i(Fl_Button*, void*);
-  static void cb_Col3Color(Fl_Button*, void*);
-  Fl_Button *Col4Color;
-  void cb_Col4Color_i(Fl_Button*, void*);
-  static void cb_Col4Color(Fl_Button*, void*);
 };
 
 #endif /* PAYMENTTABLEUI_H_ */

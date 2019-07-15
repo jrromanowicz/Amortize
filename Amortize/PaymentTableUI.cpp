@@ -8,21 +8,72 @@
 #include "PaymentTableUI.h"
 #include <FL/Fl_File_Chooser.h>
 #include <FL/Fl_ask.h>
+#include <FL/fl_draw.h>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <cstdio>
+#include <string>
 
 extern string ftoa(double);
 
 PaymentTableUI::PaymentTableUI(const LoanData& loan_, const char * title,
     vector<PaymentData> & payData) : loan(loan_), payData(payData) {
-  window = new Fl_Window(425, 606, title);
+  window = new Fl_Window(625, 606, title);
   window->user_data((void*)(this));
-  { totals = new Fl_Multiline_Output(2, 2, 429, 54);
-    totals->box(FL_NO_BOX);
-  } // Fl_Multiline_output * totals
-  { amortizeTable = new AmortizeTable(2, 80, 420, 490);
+  interestTotal = 0. ;
+  for (unsigned int i = 0 ; i < payData.size() ; i++ ) {
+	  interestTotal += payData[i].interest() ;
+  } // for each payment record by i
+  paymentsTotal = interestTotal + loan.principalAmount() ;
+  int lineh = 14;
+  fl_font(FL_HELVETICA, lineh);
+  int colw = window->w()/3; // third of window width
+  int h, w ;
+  char buf[20];
+  const char * msg1 = "Number of Payments:";
+  w = 0;
+  fl_measure(msg1, w, h);
+  {Fl_Box * b = new Fl_Box(colw - w, 2, w, lineh, msg1 );
+  	  b->copy_label(msg1);
+  	  b->align(FL_ALIGN_INSIDE|FL_ALIGN_RIGHT);
+  }
+  sprintf(buf, "%d", payData.size());
+  w = 0; // for fl_measure()
+  fl_measure(buf, w, h);
+  {Fl_Box * b = new Fl_Box(colw, 2, w, lineh, buf);
+	  b->copy_label(buf);
+	  b->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT );
+  }
+  const char * msg2 = "Total of Payments:";
+  w = 0;
+  fl_measure(msg2, w, h);
+  {Fl_Box * b = new Fl_Box(colw - w, 2 + lineh * 2, w, lineh, msg2);
+	  b->copy_label(msg2);
+  	  b->align(FL_ALIGN_INSIDE|FL_ALIGN_RIGHT);
+  }
+  sprintf(buf, "%.2f", paymentsTotal);
+  w = 0;
+  fl_measure(buf, w, h);
+  {Fl_Box * b = new Fl_Box(colw, 2 + lineh * 2, w, lineh, buf);
+  	  b->copy_label(buf);
+  	  b->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT );
+  }
+  const char * msg3 = "Total Interest Paid:";
+  w = 0;
+  fl_measure(msg3, w, h);
+  {Fl_Box * b = new Fl_Box(colw * 2 - w, 3 + lineh * 2, w, lineh, msg3);
+	  b->copy_label(msg3);
+  	  b->align(FL_ALIGN_INSIDE|FL_ALIGN_RIGHT);
+  }
+  sprintf(buf, "%.2f", interestTotal);
+  w = 0;
+  fl_measure(buf, w, h);
+  {Fl_Box * b = new Fl_Box(colw * 2, 3 + lineh * 2,  w, lineh, buf);
+  	  b->copy_label(buf);
+	  b->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT );
+  }
+  { amortizeTable = new AmortizeTable(2, 80, window->w() -5, window->h() - 80);
     amortizeTable->box(FL_NO_BOX);
     amortizeTable->color(FL_BACKGROUND_COLOR);
     amortizeTable->selection_color(FL_BACKGROUND_COLOR);
@@ -35,43 +86,13 @@ PaymentTableUI::PaymentTableUI(const LoanData& loan_, const char * title,
     amortizeTable->setData(payData);
     amortizeTable->end();
   } // AmortizeTable* amortizeTable
-  { colorButtons = new Fl_Group(85, 58, 320, 20);
-    { Col1Color = new Fl_Button(87, 59, 50, 18, "Color...");
-      Col1Color->tooltip("Choose a text color for this column");
-      Col1Color->callback((Fl_Callback*)cb_Col1Color);
-    } // Fl_Button* Col1Color
-    { Col2Color = new Fl_Button(165, 59, 50, 18, "Color...");
-      Col2Color->tooltip("Choose a text color for this column");
-      Col2Color->callback((Fl_Callback*)cb_Col2Color);
-    } // Fl_Button* Col2Color
-    { Col3Color = new Fl_Button(243, 59, 50, 18, "Color...");
-      Col3Color->tooltip("Choose a text color for this column");
-      Col3Color->callback((Fl_Callback*)cb_Col3Color);
-    } // Fl_Button* Col3Color
-    { Col4Color = new Fl_Button(326, 59, 50, 18, "Color...");
-      Col4Color->tooltip("Choose a text color for this column");
-      Col4Color->callback((Fl_Callback*)cb_Col4Color);
-    } // Fl_Button* Col4Color
-    colorButtons->end();
-  } // Fl_Group* colorButtons
-  { saveButton = new Fl_Button(165, 574, 94, 25, "Save to CSV");
+  { saveButton = new Fl_Button(165, 54, 94, 20, "Save to CSV");
+  	saveButton->color(FL_DARK3);
     saveButton->tooltip("Save amortization as a file you can open in a spreadsheet");
-    saveButton->color(fl_rgb_color(0, 128, 255));
-//    saveButton->color(fl_lighter(FL_BLUE));
     saveButton->callback((Fl_Callback*)cb_saveButton, (void*)(this));
   } // Fl_Button* saveButton
 
   window->end();
-
-  interestTotal = 0. ;
-  for (unsigned int i = 0 ; i < payData.size() ; i++ ) {
-    interestTotal += payData[i].interest() ;
-  } // for each payment record by i
-  paymentsTotal = interestTotal + loan.principalAmount() ;
-  char total[100];
-  sprintf(total, "There are %d payments\nTotal Interest: %.2f\nTotal Payments: %.2f",
-      payData.size(), interestTotal, paymentsTotal);
-  totals->value(total);
   window->show();
 } // PaymentTableUI ctor
 
@@ -116,42 +137,6 @@ void PaymentTableUI::doSave(void) {
     } // if user chose a file (TRUE branch)
 } // doSave()
 
-
-void PaymentTableUI::cb_Col1Color_i(Fl_Button*, void*) {
-  Fl_Color colColor = fl_show_colormap(amortizeTable->columnColor(1)) ;
-amortizeTable->columnColor(1, colColor) ;
-amortizeTable->redraw() ;
-}
-void PaymentTableUI::cb_Col1Color(Fl_Button* o, void* v) {
-  ((PaymentTableUI*)(o->parent()->parent()->user_data()))->cb_Col1Color_i(o,v);
-}
-
-void PaymentTableUI::cb_Col2Color_i(Fl_Button*, void*) {
-  Fl_Color colColor = fl_show_colormap(amortizeTable->columnColor(2)) ;
-amortizeTable->columnColor(2, colColor) ;
-amortizeTable->redraw() ;
-}
-void PaymentTableUI::cb_Col2Color(Fl_Button* o, void* v) {
-  ((PaymentTableUI*)(o->parent()->parent()->user_data()))->cb_Col2Color_i(o,v);
-}
-
-void PaymentTableUI::cb_Col3Color_i(Fl_Button*, void*) {
-  Fl_Color colColor = fl_show_colormap(amortizeTable->columnColor(3)) ;
-amortizeTable->columnColor(3, colColor) ;
-amortizeTable->redraw() ;
-}
-void PaymentTableUI::cb_Col3Color(Fl_Button* o, void* v) {
-  ((PaymentTableUI*)(o->parent()->parent()->user_data()))->cb_Col3Color_i(o,v);
-}
-
-void PaymentTableUI::cb_Col4Color_i(Fl_Button*, void*) {
-  Fl_Color colColor = fl_show_colormap(amortizeTable->columnColor(4)) ;
-amortizeTable->columnColor(4, colColor) ;
-amortizeTable->redraw() ;
-}
-void PaymentTableUI::cb_Col4Color(Fl_Button* o, void* v) {
-  ((PaymentTableUI*)(o->parent()->parent()->user_data()))->cb_Col4Color_i(o,v);
-}
 void PaymentTableUI::cb_saveButton_i(Fl_Button*, void* v) {
   ((PaymentTableUI *)v)->doSave() ;
 }

@@ -27,9 +27,9 @@ void AmortizeTable::init( void ) {
 	cols(NUM_COLS);
 	col_header(1); // Enable column headers
 	row_height_all(14) ;
-  col_width(0, col_width(0) - 12) ;
-  col_width(1, col_width(1) - 2) ;
-  col_width(4, col_width(4) + 13) ;
+	col_width(0, col_width(0) - 12) ;
+	col_width(1, col_width(1) - 2) ;
+	col_width(4, col_width(4) + 13) ;
 	end(); // end of our Fl_Group
 
 } // init()
@@ -61,7 +61,7 @@ void AmortizeTable::draw_cell(TableContext context,
 			fl_push_clip(x, y, w, h); // make sure text doesn't leak outside of XYWH
 			{
 				fl_draw_box(FL_THIN_UP_BOX, x, y, w, h, color()); // solid 'up box'
-  	   	fl_color(colColor[col]) ;
+				fl_color(colColor[col]) ;
 				if (0 == col) { // center the payment number
 		   		fl_draw(data[row][col].c_str(), x, y, w, h, FL_ALIGN_CENTER);
 				}
@@ -96,7 +96,7 @@ void setUpRow( vector<string> & newRow, PaymentData & payData ) {
 	newRow.clear() ; // just in case
 	newRow.push_back(itoa(payData.paymentNum())) ;
 	newRow.push_back(ftoa(payData.totalPayment())) ;
-   newRow.push_back(ftoa(payData.interest())) ;
+	newRow.push_back(ftoa(payData.interest())) ;
 	newRow.push_back(ftoa(payData.principal())) ;
 	newRow.push_back(ftoa(payData.balance())) ;
 } // setUpRow()
