@@ -25,7 +25,7 @@ public:
       const double minimumPayment, const int numberOfPayments,
       const time_t firstPayDate);
 
-  virtual ~LoanData() {/* empty survey body */}
+  virtual ~LoanData() {/* empty function body */}
 
   void checkAllParameters(void);
 

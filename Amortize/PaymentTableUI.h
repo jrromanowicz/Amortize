@@ -23,17 +23,18 @@
 
 class PaymentTableUI {
 public:
-  PaymentTableUI(const LoanData& loan, const char * title,
-      vector<PaymentData>& payData);
+  PaymentTableUI(const double loanAmt, const double interestAmt,
+	const char * title, vector<PaymentData>& payData);
   virtual ~PaymentTableUI();
   void hide() { window->hide(); }
 
 private:
   Fl_Window * window;
+  double loanAmount;
+  double interestRate;
   double interestTotal;
   double paymentsTotal;
   AmortizeTable *amortizeTable;
-  const LoanData& loan;
   vector<PaymentData> payData ;
   Fl_Button *saveButton;
   void doSave(void);

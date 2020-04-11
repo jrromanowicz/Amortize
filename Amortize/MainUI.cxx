@@ -268,7 +268,8 @@ void MainUI::doAmortization(void) {
     } // switch on loan type
     char title[100];
     sprintf(title, "%s of %.2f at %.3f%%", type.c_str(), principalAmount, interestRate);
-    PaymentTableUI * loanUI = new PaymentTableUI(thisLoan, title, amortization->paymentData());
+    PaymentTableUI * loanUI = new PaymentTableUI(principalAmount, interestRate,
+    		title, amortization->paymentData()); // display the results
     loanWindows.push_back(loanUI); // save UI to close later
 
     setText("");

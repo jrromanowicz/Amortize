@@ -53,7 +53,7 @@ Amortize::Amortize(LoanData& loan_) : loan(loan_)
 PaymentData * Amortize::makePayment(double balance, double intRate,
     double payment, int pymtNum) {
 	double interest = balance * intRate ; // interest paid
-	interest = round(interest * 100) / 100; // round to nearest penny
+	interest = round(interest * 100.) / 100.; // round to nearest penny
 	double principal = payment - interest ; // principal paid
 	if (principal <= 0) {
 	  fl_alert("The payment amount (%.2f) must be greater\nthan the first "
@@ -97,7 +97,7 @@ void Amortize::amortizePercentPayment() {
 
     while (bal > 0 ) {
       double payment = max(bal * paymentPercent() / 100, minimumPayment()) ;
-      payment = round(payment * 100) / 100; // round to nearest penny
+      payment = round(payment * 100.) / 100.; // round to nearest penny
       PaymentData * pd = makePayment( bal, rate, payment, ++pymtNum ) ;
       payData.push_back( *pd ) ;
       bal = pd->balance() ;
@@ -107,7 +107,7 @@ void Amortize::amortizePercentPayment() {
 
 void Amortize::amortizeInstallmentLoan() {
 	if (interestRate() && pmtsPerYear && principalAmount() && numberOfPayments()) {
-		double payment = round(calcInstallmentPayment() * 100) / 100 ; // round to nearest penny
+		double payment = round(calcInstallmentPayment() * 100.) / 100. ; // round to nearest penny
 	  double bal = principalAmount() ;
 	  double rate = (interestRate() / pmtsPerYear) / 100 ;
 		int pymtNum = 0 ;
@@ -123,7 +123,7 @@ void Amortize::amortizeInstallmentLoan() {
 double Amortize::calcInstallmentPayment() {
   if (interestRate() && pmtsPerYear && principalAmount() && numberOfPayments()) {
 		double rate = (interestRate() / pmtsPerYear) / 100 ;
-		return principalAmount() * (rate / (1 - pow(1. + rate, - numberOfPayments()))) ;
+		return principalAmount() * (rate / (1. - pow(1. + rate, - numberOfPayments()))) ;
 	}  // if all the needed values are defined (TRUE branch)
 	else return 0 ; // not ready to rumble
 } // calcInstallmentPayment()
