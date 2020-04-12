@@ -104,60 +104,40 @@ PaymentTableUI::~PaymentTableUI() {
 }
 
 void PaymentTableUI::doSave(void) {
-  Fl_File_Chooser saveDlg(".", "*", Fl_File_Chooser::CREATE, "Save Amortization to CSV");
-  saveDlg.preview(0);
-  saveDlg.ok_label("Save");
-  saveDlg.show();
-  while (saveDlg.shown()) Fl::wait();
-  saveDlg.hide();
-  if (NULL != saveDlg.value()) {
-	ofstream outStr(saveDlg.value(),ios::out);
-    if (!outStr ) {
-      fl_alert("Can't write to %s, data was not saved.", saveDlg.value());
-      return ;
-    } // if can't open file for output (TRUE branch)
-#include <clocale>
-char * name = setlocale(LC_ALL, "");
-fl_message("locale: %s", name);
-//name = setlocale(LC_MONETARY, "");
-//fl_message("locale: %s", name);
-    try {
-    std::locale loc = locale(name);
-    fl_message("locale: %s", loc.name().c_str());
-    outStr.imbue(loc);
-    } catch ( exception & ex) {
-    	fl_message("locale fail: %s", ex.what());
-    }
+	Fl_File_Chooser saveDlg(".", "*", Fl_File_Chooser::CREATE, "Save Amortization to CSV");
+	saveDlg.preview(0);
+	saveDlg.ok_label("Save");
+	saveDlg.show();
+	while (saveDlg.shown()) Fl::wait();
+	saveDlg.hide();
+	if (NULL != saveDlg.value()) {
+		ofstream outStr(saveDlg.value(),ios::out);
+		if (!outStr ) {
+			fl_alert("Can't write to %s, data was not saved.", saveDlg.value());
+			return ;
+		} // if can't open file for output (TRUE branch)
+		outStr << "Loan Amount,$" << ftoa(loanAmount) << endl ;
+		outStr << "Interest Rate," << ftoa(interestRate) << "%" << endl ;
+		outStr << "Number of Payments," << payData.size() << endl;
+		outStr << "Total Interest Paid,$" << ftoa(interestTotal) << endl;
+		outStr << "Total of Payments,$" << ftoa(paymentsTotal) << endl;
+		outStr << "" << endl ;
+		outStr << "Payment Number, Payment Amount, Interest Paid,"
+				<< "Principal Paid, Balance Remaining" << endl ;
 
-    outStr << "Loan Amount,$" << ftoa(loanAmount) << endl ;
-    outStr << "Interest Rate," << ftoa(interestRate) << "%" << endl ;
-    outStr << "Number of Payments," << payData.size() << endl;
-    outStr << "Total Interest Paid,$" << ftoa(interestTotal) << endl;
-    outStr << "Total of Payments,$" << ftoa(paymentsTotal) << endl;
-    outStr << "" << endl ;
-    outStr << "Payment Number, Payment Amount, Interest Paid,"
-      << "Principal Paid, Balance Remaining" << endl ;
-
-    AmortizeTable & data = *amortizeTable ;  // for brevity
-    for (int i = 0 ; i < data.rows() ; i++ ) {
-      // output each column value in the row, separated by commas
-      outStr << data.cell(i, 0)
- 		  << "," << std::put_money(data.cell(i, 1))
-      	  << "," << std::put_money(data.cell(i, 2))
-      	  << "," << std::put_money(data.cell(i, 3))
-      	  << "," << std::put_money(data.cell(i, 4))
-                << ",$" << data.cell(i, 2)
-                << ",$" << data.cell(i, 3)
-                << ",$" << data.cell(i, 4)
-/*		        << ",$" << data.cell(i, 1)
+		AmortizeTable & data = *amortizeTable ;  // for brevity
+		for (int i = 0 ; i < data.rows() ; i++ ) {
+			// output each column value in the row, separated by commas
+			outStr << data.cell(i, 0)
+				<< ",$" << data.cell(i, 1)
 		        << ",$" << data.cell(i, 2)
 		        << ",$" << data.cell(i, 3)
-		        << ",$" << data.cell(i, 4) */
-        << endl ;
-       } // for each row in the data by i
-      fl_message("Saved amortization to:\n%s", saveDlg.value());
-    outStr.close() ;
-    } // if user chose a file (TRUE branch)
+		        << ",$" << data.cell(i, 4)
+				<< endl ;
+		} // for each row in the data by i
+		fl_message("Saved amortization to:\n%s", saveDlg.value());
+		outStr.close() ;
+	} // if user chose a file (TRUE branch)
 } // doSave()
 
 void PaymentTableUI::cb_saveButton_i(Fl_Button*, void* v) {

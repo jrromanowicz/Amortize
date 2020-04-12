@@ -2,7 +2,7 @@
 
 using namespace std ;
 
-static const char * programVersion = "Amortize V2.2";
+static const char * programVersion = "Amortize V2.21";
 
 int main(int argc, char ** argv) {
 

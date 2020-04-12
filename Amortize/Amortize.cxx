@@ -4,6 +4,7 @@
 #include <string.h>
 #include <cstdio>
 #include <FL/fl_ask.h>
+#include <locale>
 
 string ftoa(double value) {
   ostringstream buf ;
@@ -56,8 +57,8 @@ PaymentData * Amortize::makePayment(double balance, double intRate,
 	interest = round(interest * 100.) / 100.; // round to nearest penny
 	double principal = payment - interest ; // principal paid
 	if (principal <= 0) {
-	  fl_alert("The payment amount (%.2f) must be greater\nthan the first "
-	      "period interest (%.2f)", payment, interest);
+	  const char * msg = "The payment amount (%.2f) must be greater\nthan the first period interest (%.2f)";
+	  fl_alert(msg, payment, interest);
 	  throw logic_error("Fixed payment is too small");
 	} // if principal paid is not positive (TRUE branch)
 	if (principal > balance) { // recalc if payment's bigger than what's owed
@@ -69,7 +70,7 @@ PaymentData * Amortize::makePayment(double balance, double intRate,
 	if (balance < 1.00) {   // avoid an extra payment for small amt
 	  payment += balance;
 	  principal += balance;
-    balance = 0 ;
+	  balance = 0 ;
 	}
 
 	return new PaymentData(principal, interest, balance, pymtNum, NULL) ;
